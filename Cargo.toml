@@ -1,0 +1,36 @@
+[package]
+authors = ["Alexander Strickner <alexander.strickner@outlook.com>"]
+name = "esp32-embassy"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Hardware abstraction layer for ESP32-C3
+# include features for embassy
+esp32c3-hal = { version = "0.9.0", features = [
+    "embassy",
+    "embassy-time",
+    "embassy-time-systick",
+] }
+
+# support for println and similar to uart/rtt
+esp-println = { version = "0.5.0", features = ["esp32c3"] }
+
+# embassy executor, including support for timers, riscv32 support, and the thread executor implementation
+embassy-executor = { version = "0.2", features = [
+    "nightly",
+    "integrated-timers",
+    "arch-riscv32",
+    "executor-thread",
+] }
+
+# embassy time, support for delays, timeouts
+embassy-time = { version = "0.1", features = ["nightly"] }
+
+# needed for panic-hook - no-std
+esp-backtrace = { version = "0.7.0", features = [
+    "esp32c3",
+    "panic-handler",
+    "exception-handler",
+    "print-uart",
+] }
