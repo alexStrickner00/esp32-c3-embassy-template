@@ -1,0 +1,3 @@
+# set the default toolchain to nightly for this project
+[toolchain]
+channel = "nightly"

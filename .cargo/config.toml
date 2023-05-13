@@ -1,0 +1,51 @@
+
+[target.riscv32imc-unknown-none-elf]
+runner = "espflash flash --monitor"
+rustflags = [
+  "-C",
+  "link-arg=-Tlinkall.x",
+
+  # use frame pointers, used for backtraces in esp-backtrace
+  "-C",
+  "force-frame-pointers",
+
+  # esp32-c3 processor (RISCV + IMC) has atomic operations, but only load/store, no compare-and-swap (see https://github.com/knurling-rs/defmt/issues/597#issuecomment-1280572770 and https://github.com/embassy-rs/embassy/issues/745#issuecomment-1445069621)
+  # therefore the riscv32imc-unknown-none-elf target does not have atomics enabled by default.
+  # embassy and defmt require atomics, so we need to enable atomic codegen manually.
+  # atomic operations (CAS) are therefore implemented by a trap handler in embassy by using critical sections.
+
+  # enable the atomic codegen option for RISCV
+  "-C",
+  "target-feature=+a",
+  # tell the core library have atomics even though it's not specified in the target definition
+  "--cfg",
+  "target_has_atomic_load_store",
+  "--cfg",
+  'target_has_atomic_load_store="8"',
+  "--cfg",
+  'target_has_atomic_load_store="16"',
+  "--cfg",
+  'target_has_atomic_load_store="32"',
+  "--cfg",
+  'target_has_atomic_load_store="ptr"',
+  # enable cas
+  "--cfg",
+  "target_has_atomic",
+  "--cfg",
+  'target_has_atomic="8"',
+  "--cfg",
+  'target_has_atomic="16"',
+  "--cfg",
+  'target_has_atomic="32"',
+  "--cfg",
+  'target_has_atomic="ptr"',
+]
+
+# set the default target to riscv32imc-unknown-none-elf
+[build]
+target = "riscv32imc-unknown-none-elf"
+
+
+[unstable]
+# enable buuilding the core library for RISCV to get the atomic codegen
+build-std = ["core"]
